@@ -78,13 +78,8 @@
 	
 	#newsContainer {
 		background-color:white;
-<<<<<<< HEAD
 		width: 1024px;
 		height: 768px;
-=======
-		width: 500px;
-		height: 300px;
->>>>>>> e512d71d80e425d8acc78fd8c6f42e4af0734310
 		margin: 0 auto; /* we center our container div */
 		border: 1px solid #99CC00;
 		padding: 7px;
@@ -113,6 +108,10 @@
 	
 	#newsContent {
 		padding: 10px;
+		width:850px; 
+		height:750px;
+		background-color:#F2F2F2;
+		overflow:auto;
 	}
 	
 	#newsLoading {
@@ -122,40 +121,38 @@
 	}
 	-->
 	</style>
+<script type="text/javascript">
+      <!--
+      i = 0;
+      tempo = 50;
+      tamanho = 826; // tamanho da barra de rolagem  >> Ver arquivo Leiame.txt
+
+      function Rolar() {
+        document.getElementById('newsContent').scrollTop = i;
+        i++;
+        t = setTimeout("Rolar()", tempo);
+        if (i == tamanho) {
+          i = 0;
+        }
+      }
+      function Parar() {
+        clearTimeout(t);
+      }
+      //-->
+    </script>
 </head>
 <body>
-<<<<<<< HEAD
 		<h1><center>AWS CSV PARSE</center></h1>
 <br />
 
-	<div id="newsContainer">
-		<div id="newsCategoriesContainer">
+	<div id="newsContainer" style="overflow: hidden;cursor: default;">
+		<div id="newsCategoriesContainer" style="cursor: default; overflow: hidden;">
 			<div class="newsCat" id="cat1">AWS CSV</div>
 			<div class="newsCat" id="cat2">CONTROLE</div>
 			<div class="newsCat" id="cat3">PARSE</div>
-=======
-		<h1>Demo: AJAX with Prototype: Display multiple pages without refreshing</h1>
-		<div id="tagLine">a fresh how-to guide featuring the powerful Javascript framework named Prototype</div> 
-
-			<div id="credits">Author: <a href="mailto:nikolaas [[AT]] torn [[DOT]] be" title="The author of this article is Nikolaas De Geyndt">Nikolaas De Geyndt</a>
-		    | This demo appeared on tutorial: <a href="http://webdesign.torn.be/tutorials/javascript/prototype/page-loading/" title="This article appeared on http://webdesign.torn.be/tutorials/javascript/prototype/page-loading/">http://webdesign.torn.be/tutorials/javascript/prototype/page-loading/</a></div>
-
-<br />
-
-	<h3>The News Today</h3> 
-	<div id="newsContainer">
-		<div id="newsCategoriesContainer">
-			<div class="newsCat" id="newsCat1">Politics</div>
-			<div class="newsCat" id="newsCat2">Sports</div>
-			<div class="newsCat" id="newsCat3">Lifestyle</div>
->>>>>>> e512d71d80e425d8acc78fd8c6f42e4af0734310
 		</div>
 		<div id="newsLoading">Loading <img src="loading_indicator.gif" title="Loading..." alt="Loading..." border="0" /></div>
 		<div id="newsContent"></div>
 	</div>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> e512d71d80e425d8acc78fd8c6f42e4af0734310

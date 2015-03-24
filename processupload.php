@@ -41,27 +41,22 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	$NewFileName 		= $Random_Number.$File_Ext; //new file name
 	$NewFileName_controle 		= $Random_Number.$File_Ext; //new file name
 	
-	$error=0
+	$error=0;
 	//(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName ))
 	if(move_uploaded_file($_FILES['FileInput']['tmp_name'],$UploadDirectory."baseaws.csv" ))
 	   {
 		echo ("Success! File Uploaded: $File_Name <br>");
-		$error=1
+		$error=1;
 	}else{
 		die("error uploading Files!");
 	}
 	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle.csv" ))
 	   {
 		echo("Success! File Uploaded: $File_Name_controle");
-		error=1
+		$error=1;
 	}else{
 		die("error uploading Files!");
 	}
-	
-	if ($error = 0 )
-		{
-			
-
 	
 }
 else
