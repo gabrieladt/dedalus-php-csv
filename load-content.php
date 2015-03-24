@@ -33,27 +33,45 @@ function merge_files ($file1,$file2) {
 	$merge_tmp = fopen("./uploads/merge_tmp.csv", "w") or die("Unable to open file!");
 
         $handle_controle = fopen ("./uploads/".$file1,"r");
-        $handle_base = fopen ("./uploads/".$file2,"r");
         while (($data = fgetcsv($handle_controle, 1000, ",")) !== FALSE) {
                 $num = count ($data);
 		//$data_base = fgetcsv($handle_base, 1000, ",");
 		//echo "$data_base[0]\n $num";
 		//print array_search('908611282160', $data);
 		$linked_ids=(explode("|", $data[1]));
-		foreach ($linked_ids as $linked_values ){
-			print "$linked_values";
+		//foreach ($linked_ids as $linked_values ){
+		for ($i=0; $i<sizeof($linked_ids)-1; $i++ ){
+			print "$linked_ids[$i]  CAT<br> ";
+			print "rodou <br>";
+	
+			rewind($handle_base);
+			fseek($handle_base,0);
+			//while(! feof($handle_base)){
+        		$handle_base = fopen ("./uploads/".$file2,"r");
+        		while (($data_base = fgetcsv($handle_base, 1000, ",")) !== FALSE) {
+				//$var=explode (",",fgets($handle_base));
+				if(!empty($data_base[2])){
+					echo " $linked_ids[$i] ==  $data_base[2]<br>";
+					$reg="/$data[2]/";
+					if (($linked_ids[$i] == $data_base[2]) AND (!preg_match("$reg",$data_base[12]))) {
+						print $data_base[12]."--".$data_base[2]." igual <br>";
+//						$reg="/$data[2]/";
+//						if (preg_match("$reg",$data_base[12])) {
+//							echo "entrou <br>";
+//						}
+					}
+				}
+			}
+			fclose($handle_base);
+			
 		}
-
-		//print $data[1];
 		
-                for ($c=0; $c < $num; $c++) {
 				
-			fwrite ($merge_tmp, $data[$c].",");
-//                        echo $data[$c].",\n";
-                }
+		//fwrite ($merge_tmp, $data[$c].",");
 		fwrite ($merge_tmp,"\n");
 		
         }
+	fclose($handle_base);
         fclose ($handle_controle);
 	fclose($merge_tmp);
 	exec("sed -i 's/,$//g' ./uploads/merge_tmp.csv");
