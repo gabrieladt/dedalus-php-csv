@@ -1,0 +1,29 @@
+{
+  "deploy": {
+    "csv-dedalus": {
+      "application_type": "php",
+      "document_root": "",
+      "scm": {
+        "scm_type": "git",
+        "repository": "dev/csv-dedalus"
+      },
+      "memcached": {"host": null,
+                "port": 11211}
+    }
+  },
+  "opsworks": {
+    "layers": {
+      "php-app": {
+        "instances": {
+          "php-app1": {"private-ip": "10.10.10.10"}
+        }
+      }
+    }
+  },
+  "opsworks_custom_cookbooks": {
+    "enabled": true,
+    "scm": {
+      "repository": "ops/cookbooks"
+    }
+  }
+}
