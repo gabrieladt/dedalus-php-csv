@@ -10,6 +10,7 @@ function stringForJavascript($in_string) {
    $str = ereg_replace('"', '\\"', $str);
    return $str;
 }
+<<<<<<< HEAD
 function read_csv ($file) {
 	$row = 1;
 	$handle = fopen ("./uploads/".$file,"r");
@@ -33,6 +34,16 @@ switch($_GET['id']) {
 		$content = 'This is content for page Sports.';
 		break;
 	case 'cat3':
+=======
+switch($_GET['id']) {
+	case 'newsCat1':
+		$content = 'This is content for page Politics.';
+		break;
+	case 'newsCat2':
+		$content = 'This is content for page Sports.';
+		break;
+	case 'newsCat3':
+>>>>>>> e512d71d80e425d8acc78fd8c6f42e4af0734310
 		$content = 'This is content for page Lifestyle.';
 		break;
 	default:
