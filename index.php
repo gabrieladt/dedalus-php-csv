@@ -73,7 +73,7 @@ function beforeSubmit(){
         	}
 		
 		//Allowed file size is less than 5 MB (1048576)
-		if(fsize>8388608) 
+		if(fsize>20000000) 
 		{
 			$("#output").html("<b>"+bytesToSize(fsize) +"</b> Too big file! <br />File is too big, it should be less than 8 MB.");
 			return false
