@@ -19,7 +19,7 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	
 	
 	//Is file size is less than allowed size.
-	if ($_FILES["FileInput"]["size"] > 5242880) {
+	if ($_FILES["FileInput"]["size"] > 20000000) {
 		die("File size is too big!");
 	}
 	
@@ -27,33 +27,34 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	switch(strtolower($_FILES['FileInput']['type']))
 		{
 			//allowed file types
-            case 'image/png': 
-			case 'image/gif': 
-			case 'image/jpeg': 
-			case 'image/pjpeg':
-			case 'text/plain':
-			case 'text/html': //html file
-			case 'application/x-zip-compressed':
-			case 'application/pdf':
-			case 'application/msword':
-			case 'application/vnd.ms-excel':
-			case 'video/mp4':
-				break;
-			default:
-				die('Unsupported File!'); //output error
+		case 'text/csv': 
+			break;
+		default:
+		die('Unsupported File!'); //output error
 	}
 	
 	$File_Name          = strtolower($_FILES['FileInput']['name']);
+	$File_Name_controle          = strtolower($_FILES['FileInput_controle']['name']);
 	$File_Ext           = substr($File_Name, strrpos($File_Name, '.')); //get file extention
+	$File_Ext_controle           = substr($File_Name_controle, strrpos($File_Name_controle, '.')); //get file extention
 	$Random_Number      = rand(0, 9999999999); //Random number to be added to name.
 	$NewFileName 		= $Random_Number.$File_Ext; //new file name
+	$NewFileName_controle 		= $Random_Number.$File_Ext; //new file name
 	
-	if(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName ))
+	//(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName ))
+	if(move_uploaded_file($_FILES['FileInput']['tmp_name'],$UploadDirectory."baseaws.csv" ))
 	   {
-		die('Success! File Uploaded.');
+		echo ("Success! File Uploaded: $File_Name <br>");
 	}else{
-		die('error uploading File!');
+		die("error uploading Files!");
 	}
+	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle.csv" ))
+	   {
+		echo("Success! File Uploaded: $File_Name_controle");
+	}else{
+		die("error uploading Files!");
+	}
+
 	
 }
 else
