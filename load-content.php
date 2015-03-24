@@ -55,10 +55,14 @@ function merge_files ($file1,$file2) {
 					$reg="/$data[2]/";
 					if (($linked_ids[$i] == $data_base[2]) AND (!preg_match("$reg",$data_base[12]))) {
 						print $data_base[12]."--".$data_base[2]." igual <br>";
-//						$reg="/$data[2]/";
-//						if (preg_match("$reg",$data_base[12])) {
-//							echo "entrou <br>";
-//						}
+                                                $num = count ($data_base);
+                                                echo "aaaa $num <br>";
+                                                for ($c=0; $c < $num; $c++) {
+                                                        echo $data_base[$c].",";
+							fwrite ($merge_tmp, $data_base[$c].",");
+                                                }
+						fwrite ($merge_tmp,"\n");
+
 					}
 				}
 			}
@@ -68,7 +72,7 @@ function merge_files ($file1,$file2) {
 		
 				
 		//fwrite ($merge_tmp, $data[$c].",");
-		fwrite ($merge_tmp,"\n");
+		//fwrite ($merge_tmp,"\n");
 		
         }
 	fclose($handle_base);
