@@ -149,10 +149,11 @@
 		<div id="newsCategoriesContainer" style="cursor: default; overflow: hidden;">
 			<div class="newsCat" id="cat1">AWS CSV</div>
 			<div class="newsCat" id="cat2">CONTROLE</div>
-			<div class="newsCat" id="cat3">PARSE</div>
+			<div class="newsCat" id="cat3">MERGED</div>
 		</div>
 		<div id="newsLoading">Loading <img src="loading_indicator.gif" title="Loading..." alt="Loading..." border="0" /></div>
 		<div id="newsContent"></div>
-	</div>
+	</div><br><center><a href="index.php">VOLTAR</a></center>
+
 </body>
 </html>

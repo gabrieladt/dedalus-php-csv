@@ -39,7 +39,7 @@ if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 	
 	$db->exec("DROP TABLE IF EXISTS $table");
 
-	$create_table_sql = "CREATE TABLE IF NOT EXISTS $table ($create_fields_str)";
+	$create_table_sql = "CREATE TABLE IF NOT EXISTS $table (id integer primary key autoincrement, $create_fields_str, removed INTEGER DEFAULT 0)";
 	$db->exec($create_table_sql);
 
 	$insert_fields_str = join(', ', $fields);
@@ -50,6 +50,7 @@ if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 	$final="";
 	while (($data = fgetcsv($csv_handle, 0, $delimiter)) !== FALSE) {
 		$num = count ($data);
+		$tmp="";
 		for ($c=0; $c < $num; $c++) {
 			$tmp.="\"".$data[$c]."\",";
 		}
@@ -61,17 +62,17 @@ if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 		
 	
 	fclose($csv_handle);
+/*
+$results = $db->query("SELECT * FROM $table");
+while ($row = $results->fetchArray()) {
+        var_dump($row);
+	echo "$row <br> *";
 
-//$results = $db->query("SELECT * FROM $table");
-//while ($row = $results->fetchArray()) {
-//        var_dump($row);
-//	echo "$row <br> *";
-
-//}
 }
+*/
+}
+//import_csv ("./uploads/baseaws.csv");
 
-import_csv ("./uploads/controle.csv");
-import_csv ("./uploads/baseaws.csv");
 if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 {
 	############ Edit settings ##############
