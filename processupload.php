@@ -1,5 +1,77 @@
 <?php
+function import_csv ($csv_path) {
+/*
+ * PHP SQLite - Create a table and insert rows in SQLite
+ */
 
+//Open the database mydb
+$db = new SQLite3('./db/mydb');
+
+//drop the table if already exists
+//b->exec('DROP TABLE IF EXISTS people');
+
+//Create a basic table
+//$db->exec('CREATE TABLE people (full_name varchar(255), job_title varchar (255))');
+
+//insert rows
+//$db->exec('INSERT INTO people (full_name, job_title) VALUES ("John Doe","manager")');
+//$db->exec('INSERT INTO people (full_name, job_title) VALUES ("Jane Cyrus","assistant")');
+if (($csv_handle = fopen($csv_path, "r")) === FALSE)
+	throw new Exception('Cannot open CSV file');
+		
+	if(!$delimiter)
+		$delimiter = ',';
+		
+	if(!$table)
+		$table = preg_replace("/[^A-Z0-9]/i", '', basename($csv_path));
+	
+	if(!$fields){
+		$fields = array_map(function ($field){
+			return strtolower(preg_replace("/[^A-Z0-9]/i", '', $field));
+		}, fgetcsv($csv_handle, 0, $delimiter));
+	}
+	
+	$create_fields_str = join(', ', array_map(function ($field){
+		return "$field TEXT NULL";
+	}, $fields));
+
+//	echo "XXXXXXXXXxx $table -- $create_fields_str ";
+	
+	$db->exec("DROP TABLE IF EXISTS $table");
+
+	$create_table_sql = "CREATE TABLE IF NOT EXISTS $table ($create_fields_str)";
+	$db->exec($create_table_sql);
+
+	$insert_fields_str = join(', ', $fields);
+	$insert_values_str = join(', ', array_fill(0, count($fields),  '?'));
+	//$insert_sql = "INSERT INTO $table ($insert_fields_str) VALUES ($insert_values_str)";
+	//$insert_sth = $db->exec($insert_sql);
+	
+	$final="";
+	while (($data = fgetcsv($csv_handle, 0, $delimiter)) !== FALSE) {
+		$num = count ($data);
+		for ($c=0; $c < $num; $c++) {
+			$tmp.="\"".$data[$c]."\",";
+		}
+		$final=rtrim($tmp,",");
+		$insert_sql = "INSERT INTO $table ($insert_fields_str) VALUES ($final)";
+		//echo $insert_sql."<br>";
+		$insert_sth = $db->exec($insert_sql);
+	}
+		
+	
+	fclose($csv_handle);
+
+//$results = $db->query("SELECT * FROM $table");
+//while ($row = $results->fetchArray()) {
+//        var_dump($row);
+//	echo "$row <br> *";
+
+//}
+}
+
+import_csv ("./uploads/controle.csv");
+import_csv ("./uploads/baseaws.csv");
 if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 {
 	############ Edit settings ##############
@@ -41,23 +113,30 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	$NewFileName 		= $Random_Number.$File_Ext; //new file name
 	$NewFileName_controle 		= $Random_Number.$File_Ext; //new file name
 	
-	$error=0;
+	$error_base=1;
+	$error_cont=1;
 	//(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName ))
 	if(move_uploaded_file($_FILES['FileInput']['tmp_name'],$UploadDirectory."baseaws.csv" ))
 	   {
 		echo ("Success! File Uploaded: $File_Name <br>");
-		$error=1;
+		import_csv ($UploadDirectory."baseaws.csv");
+		$error_base=1;
 	}else{
 		die("error uploading Files!");
 	}
 	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle.csv" ))
 	   {
 		echo("Success! File Uploaded: $File_Name_controle");
-		$error=1;
+		import_csv ($UploadDirectory."controle.csv");
+		$error_cont=1;
 	}else{
 		die("error uploading Files!");
 	}
 	
+	if (($error_base=1) and  ($error_cont=1)){
+		echo "<br><br><a href=\"./parse.php\">SUCESSO AO IMPORTAR ARQUIVOS - SEGUIR</a>";
+	}
+		
 }
 else
 {

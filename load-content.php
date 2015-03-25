@@ -10,6 +10,7 @@
 <title>Ajax Workshop 2: Building Tabbed Content</title>
 <body>
 <?php
+
 function stringForJavascript($in_string) {
    $str = ereg_replace("[\r\n]", " \\n\\\n", $in_string);
    $str = ereg_replace('"', '\\"', $str);
@@ -96,10 +97,11 @@ switch($_GET['id']) {
 		$content = 'There was an error.';
 
 } 
-//print stringForJavascript($content);
-//usleep(600000);
+print stringForJavascript($content);
+usleep(600000);
 
-merge_files("controle.csv","baseaws.csv");
+//merge_files("controle.csv","baseaws.csv");
+
 ?>
 
 </body>
