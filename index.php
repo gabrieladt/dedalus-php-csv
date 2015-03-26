@@ -1,3 +1,13 @@
+<?php
+if(session_id() == '') {
+	session_start();
+	$id=uniqid();
+	if (empty($_SESSION['id'])){
+		$_SESSION['id'] = $id; 
+	}
+}
+?>
+
 <!DOCTYPE HTML>
 <html>
 <head>

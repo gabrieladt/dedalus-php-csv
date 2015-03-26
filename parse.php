@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if(!isset($_SESSION['id'])){ //if login in session is not set
+    header("Location: index.php");
+}
+if (!empty($_SESSION['id'])){
+        $prefix=$_SESSION['id'] ;
+}
+
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -149,7 +160,8 @@
 		<div id="newsCategoriesContainer" style="cursor: default; overflow: hidden;">
 			<div class="newsCat" id="cat1">AWS CSV</div>
 			<div class="newsCat" id="cat2">CONTROLE</div>
-			<div class="newsCat" id="cat3">MERGED</div>
+			<div class="newsCat" id="cat3">FINAL</div>
+			<div class="newsCat" id="cat4">EMAIL</div>
 		</div>
 		<div id="newsLoading">Loading <img src="loading_indicator.gif" title="Loading..." alt="Loading..." border="0" /></div>
 		<div id="newsContent"></div>

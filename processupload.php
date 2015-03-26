@@ -1,29 +1,73 @@
 <?php
+session_start();
+
+if(!isset($_SESSION['id'])){ //if login in session is not set
+    header("Location: index.php");
+}        
+if (!empty($_SESSION['id'])){
+	$prefix=$_SESSION['id'] ;
+}
+$db = new SQLite3('./db/mydb');
+$db1 = new SQLite3('./db/mydb');
+
+//$create_table_sql = "DROP table controle_tabelas";
+//$create_table_sql = "CREATE TABLE IF NOT EXISTS controle_tabelas (id TEXT primary key,tabela TEXT, date TEXT)";
+//$create_table_sql = "CREATE TABLE IF NOT EXISTS controle_tabelas (tabela TEXT primary key, created date)";
+//$db->exec($create_table_sql);
+
+
+
+//$results = $db->query("SELECT name FROM sqlite_master WHERE type='table';");
+//while ($row = $results->fetchArray()) {
+//	print $row['name']."<br>";
+//	print_r ($row)."<b><br>";
+//}
+//print "--------------<br>";
+$old= date("Y-m-d", time() - (86400*30));
+
+$results = $db->query("SELECT * FROM controle_tabelas where created <= '$old'");
+//$results = $db->query("SELECT * FROM controle_tabelas");
+$row="";
+$tabela="";
+$i=0;
+while ($row = $results->fetchArray()) {
+//	print $row['tabela']."  - ".$row['created']." <br>";
+	$tabela[$i]= $row['tabela'];
+	$i++;
+}
+foreach ($tabela as $value) {
+	$db->exec("DROP TABLE IF EXISTS $value");
+	$db->exec("delete from controle_tabelas where tabela='$value'");
+	unlink("./uploads/$value");
+}
+//$db->exec("DROP TABLE IF EXISTS $tabela");
+
+//$table="baseaws.csv";
+//$date = new DateTime('2015-02-01');
+//$dia = $date->format('Y-m-d');
+//print "-- $prefix $dia <br>";
+
+//$db->exec("INSERT OR IGNORE INTO controle_tabelas (id,tabela,created) values (\"".$prefix."\",\"".$table.$prefix."\",\"".$dia."\")");
+
+
+
+//session_destroy();
+
+
 function import_csv ($csv_path) {
-/*
- * PHP SQLite - Create a table and insert rows in SQLite
- */
 
 //Open the database mydb
 $db = new SQLite3('./db/mydb');
 
-//drop the table if already exists
-//b->exec('DROP TABLE IF EXISTS people');
 
-//Create a basic table
-//$db->exec('CREATE TABLE people (full_name varchar(255), job_title varchar (255))');
 
-//insert rows
-//$db->exec('INSERT INTO people (full_name, job_title) VALUES ("John Doe","manager")');
-//$db->exec('INSERT INTO people (full_name, job_title) VALUES ("Jane Cyrus","assistant")');
 if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 	throw new Exception('Cannot open CSV file');
-		
 	if(!$delimiter)
 		$delimiter = ',';
 		
 	if(!$table)
-		$table = preg_replace("/[^A-Z0-9]/i", '', basename($csv_path));
+		$table = basename($csv_path);
 	
 	if(!$fields){
 		$fields = array_map(function ($field){
@@ -41,6 +85,11 @@ if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 
 	$create_table_sql = "CREATE TABLE IF NOT EXISTS $table (id integer primary key autoincrement, $create_fields_str, removed INTEGER DEFAULT 0)";
 	$db->exec($create_table_sql);
+	
+	$date = new DateTime();
+	$dia = $date->format('Y-m-d');
+
+	$db->exec("INSERT OR IGNORE INTO controle_tabelas (tabela,created) values (\"".$table."\",\"".$dia."\")");
 
 	$insert_fields_str = join(', ', $fields);
 	$insert_values_str = join(', ', array_fill(0, count($fields),  '?'));
@@ -62,6 +111,9 @@ if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 		
 	
 	fclose($csv_handle);
+	//b->exec("update $table set totalcost = replace (totalcost,\",\",\".\")");
+	//$db->exec("update $table set total=totalcost");
+
 /*
 $results = $db->query("SELECT * FROM $table");
 while ($row = $results->fetchArray()) {
@@ -72,7 +124,6 @@ while ($row = $results->fetchArray()) {
 */
 }
 //import_csv ("./uploads/baseaws.csv");
-
 if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 {
 	############ Edit settings ##############
@@ -105,30 +156,29 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 		default:
 		die('Unsupported File!'); //output error
 	}
-	
-	$File_Name          = strtolower($_FILES['FileInput']['name']);
-	$File_Name_controle          = strtolower($_FILES['FileInput_controle']['name']);
-	$File_Ext           = substr($File_Name, strrpos($File_Name, '.')); //get file extention
-	$File_Ext_controle           = substr($File_Name_controle, strrpos($File_Name_controle, '.')); //get file extention
-	$Random_Number      = rand(0, 9999999999); //Random number to be added to name.
-	$NewFileName 		= $Random_Number.$File_Ext; //new file name
-	$NewFileName_controle 		= $Random_Number.$File_Ext; //new file name
+        $File_Name          = strtolower($_FILES['FileInput']['name']);
+        $File_Name_controle          = strtolower($_FILES['FileInput_controle']['name']);
+        $File_Ext           = substr($File_Name, strrpos($File_Name, '.')); //get file extention
+        $File_Ext_controle           = substr($File_Name_controle, strrpos($File_Name_controle, '.')); //get file extention
+        $Random_Number      = rand(0, 9999999999); //Random number to be added to name.
+        $NewFileName            = $Random_Number.$File_Ext; //new file name
+        $NewFileName_controle           = $Random_Number.$File_Ext; //new file name
 	
 	$error_base=1;
 	$error_cont=1;
 	//(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName ))
-	if(move_uploaded_file($_FILES['FileInput']['tmp_name'],$UploadDirectory."baseaws.csv" ))
+	if(move_uploaded_file($_FILES['FileInput']['tmp_name'],$UploadDirectory."baseaws".$prefix."csv" ))
 	   {
 		echo ("Success! File Uploaded: $File_Name <br>");
-		import_csv ($UploadDirectory."baseaws.csv");
+		import_csv ($UploadDirectory."baseaws".$prefix."csv");
 		$error_base=1;
 	}else{
 		die("error uploading Files!");
 	}
-	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle.csv" ))
+	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle".$prefix."csv" ))
 	   {
 		echo("Success! File Uploaded: $File_Name_controle");
-		import_csv ($UploadDirectory."controle.csv");
+		import_csv ($UploadDirectory."controle".$prefix."csv");
 		$error_cont=1;
 	}else{
 		die("error uploading Files!");

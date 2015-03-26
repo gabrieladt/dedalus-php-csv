@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if(!isset($_SESSION['id'])){ //if login in session is not set
+    header("Location: index.php");
+}
+if (!empty($_SESSION['id'])){
+        $prefix=$_SESSION['id'] ;
+}
+
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -20,12 +31,14 @@ function stringForJavascript($in_string) {
 function read_table ($table) {
 
 	$db = new SQLite3('./db/mydb');
+	
+
 //	$tablesquery = $db->query("SELECT name FROM sqlite_master WHERE type='table';");
 
 //	while ($table = $tablesquery->fetchArray(SQLITE3_ASSOC)) {
 //		echo $table['name'] . '<br />';
 //	}
-	print "<font size=2>";
+	print "<font size=1.5>";
 	print "<table border=1>";
 	print "<tr><td>id</td><td>Invoiceid</td><td>Linkedaccountid</td><td>Start Date</td><td>End Date</td><td>ProdCode</td><td>ItemDescription</td><td>Total</td></tr>";
 
@@ -56,15 +69,17 @@ function read_table_controle ($table) {
 //		echo $table['name'] . '<br />';
 //	}
 	print "<font size=2>";
-	print "<table border=1>";
-	print "<tr><td>id</td><td>Grupo</td><td>Linkedaccountid</td><td>Remover</td><td>Email</td></tr>";
+	print "<table border=1.5>";
+	print "<tr><td>id</td><td>contrato</td><td>Grupo</td><td>Linkedaccountid</td><td>Remover</td><td>fator</td><td>Email</td></tr>";
 
 	$results = $db->query("SELECT * FROM $table");
 	while ($row = $results->fetchArray()) {
 		print "<tr><td>".$row['id']."</td>";
+		print "<td>".$row['contrato']."</td>";
 		print "<td>".$row['grupo']."</td>";
 		print "<td>".$row['linkedaccountid']."</td>";
 		print "<td>".$row['remover']."</td>";
+		print "<td>".$row['fator']."</td>";
 		print "<td>".$row['email']."</td></tr>";
 
 	}
@@ -77,13 +92,53 @@ function read_table_controle ($table) {
 
 function merge_table ($base,$controle) {
         $db = new SQLite3('./db/mydb');
+	print "Index:<br>";
+	print "<a name=\"Index\">";
+	
+        $results = $db->query("SELECT * FROM $controle");
+	$row="";
+        while ($row = $results->fetchArray()) {
+		print "<a href=\"#".$row['grupo']."\">".$row['grupo']."</a><br>";
+//                print "<a name=\"".$row['grupo']."\">";
+	}
+	print "</a>";
 
 	print "<form action=\"update.php\" method=\"post\">";
 
         $results = $db->query("SELECT * FROM $controle");
+	$row="";
         while ($row = $results->fetchArray()) {
-                print "<br>".$row['grupo']."</br>";
+		print "<a name=\"".$row['grupo']."\">";
+
+                $ids = explode(";",$row['linkedaccountid']);
+                $tmp="";
+                for ($i=0; $i<sizeof($ids); $i++ ){
+                        $tmp.="\"".$ids[$i]."\",";
+
+                }
+                $final_controle=rtrim($tmp,",");
+		$update_base = $db->query("update $base set removed=1 where linkedaccountid in ($final_controle) and productcode in ($final_remover)");		
+		$results_base2 = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) and removed=0");
+		$j=0;
+		$total=0;
+		$row2="";	
+		while ($row2 = $results_base2->fetchArray()) {
+			$total = $total + str_replace(",",".",$row2['totalcost']);
+			//$total = $total + $row2['totalcost'];
+			print $row2['totalcost']."<br>";
+		
+		}
+		$fator = $total * $row["fator"];
 		print "<font size=2>";
+                print "$final_controle <br>Contrato: ".$row['contrato']."<br>";
+		print "Cliente: ".$row['grupo']."</br>";
+		print "Fator: ".$row['fator']."</br>";
+		//print "Total Fatura: R$ ".$total." <br>";
+		print "Total Fatura: R$ ".number_format($total, 2, ',', '')." <br>";
+		print "Total Fatura * Fator: R$ ".number_format($fator, 2, ',', '')." <br>";
+		print "</font>";
+		
+		print "<font size=1.5>";
         	print "<table border=1>";
 		print "<tr><td>id</td><td>Invoiceid</td><td>Linkedaccountid</td><td>Start Date</td><td>End Date</td><td>ProdCode</td><td>ItemDescription</td><td>Total</td><td>REMOVE</td></tr>";
 		$ids = explode(";",$row['linkedaccountid']);
@@ -103,8 +158,9 @@ function merge_table ($base,$controle) {
 		$final_remover=rtrim($tmp2,",");
 		//print $final_remover."<br>";
 		
-		$update_base = $db->query("update $base set removed=1 where linkedaccountid in ($final_controle) and productcode in ($final_remover)");		
-		$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) order by linkedaccountid, totalcost");		
+		//$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) order by linkedaccountid, totalcost");		
+		$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle)");		
+		//$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) and removed=0");		
 		$row="";
 		while ($row = $results_base->fetchArray()) {
 			$id = $row['id'];	
@@ -138,6 +194,8 @@ function merge_table ($base,$controle) {
 		print "</font>";
 		print "<center><input type=\"submit\" name=\"REMOVER\"/></center>";
 
+		print "</a>";
+		print "<br><center><a href=\"#Index\">Index</a><br></center>";
         }
 	print "</form>";
 
@@ -146,13 +204,16 @@ function merge_table ($base,$controle) {
 switch($_GET['id']) {
 	case 'cat1':
 		//$content = 'This is content for page Politics.';
-		$content = read_table("baseawscsv");
+		$content = read_table("baseaws".$prefix."csv");
 		break;
 	case 'cat2':
-		$content = read_table_controle("controlecsv");
+		$content = read_table_controle("controle".$prefix."csv");
 		break;
 	case 'cat3':
-		$content = merge_table("baseawscsv","controlecsv");
+		$content = merge_table("baseaws".$prefix."csv","controle".$prefix."csv");
+		break;
+	case 'cat4':
+		//$content = merge_table("baseawscsv","controlecsv");
 		break;
 	default:
 		$content = 'There was an error.';
