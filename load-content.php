@@ -92,7 +92,7 @@ function read_table_controle ($table) {
 
 function merge_table ($base,$controle) {
         $db = new SQLite3('./db/mydb');
-	print "Index:<br>";
+	print "Index:<br><br>";
 	print "<a name=\"Index\">";
 	
         $results = $db->query("SELECT * FROM $controle");
@@ -111,27 +111,37 @@ function merge_table ($base,$controle) {
 		print "<a name=\"".$row['grupo']."\">";
 
                 $ids = explode(";",$row['linkedaccountid']);
+                $remover = explode(";",$row['remover']);
                 $tmp="";
+                $tmp2="";
                 for ($i=0; $i<sizeof($ids); $i++ ){
                         $tmp.="\"".$ids[$i]."\",";
 
                 }
                 $final_controle=rtrim($tmp,",");
-		$update_base = $db->query("update $base set removed=1 where linkedaccountid in ($final_controle) and productcode in ($final_remover)");		
+
+                for ($j=0; $j<sizeof($remover); $j++ ){
+                        $tmp2.="\"".$remover[$j]."\",";
+
+                }
+                $final_remover=rtrim($tmp2,",");
+
+		$update_base1 = $db->query("update $base set removed=1 where linkedaccountid in ($final_controle) and productcode in ($final_remover)");		
 		$results_base2 = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) and removed=0");
 		$j=0;
 		$total=0;
-		$row2="";	
+		$row2="";
+		$valor="";
 		while ($row2 = $results_base2->fetchArray()) {
-			$total = $total + str_replace(",",".",$row2['totalcost']);
-			//$total = $total + $row2['totalcost'];
-			print $row2['totalcost']."<br>";
+			$valor=str_replace(',', '.', str_replace('.', '', $row2['totalcost']));
+			$total = $total + $valor;
+			//print $row2['totalcost']."<br>";
 		
 		}
 		$fator = $total * $row["fator"];
 		print "<font size=2>";
-                print "$final_controle <br>Contrato: ".$row['contrato']."<br>";
-		print "Cliente: ".$row['grupo']."</br>";
+                print "<br>Contrato: ".$row['contrato']."<br>";
+		print "Cliente: ".$row['grupo']." - ".$row['email']."</br>";
 		print "Fator: ".$row['fator']."</br>";
 		//print "Total Fatura: R$ ".$total." <br>";
 		print "Total Fatura: R$ ".number_format($total, 2, ',', '')." <br>";
@@ -141,21 +151,6 @@ function merge_table ($base,$controle) {
 		print "<font size=1.5>";
         	print "<table border=1>";
 		print "<tr><td>id</td><td>Invoiceid</td><td>Linkedaccountid</td><td>Start Date</td><td>End Date</td><td>ProdCode</td><td>ItemDescription</td><td>Total</td><td>REMOVE</td></tr>";
-		$ids = explode(";",$row['linkedaccountid']);
-		$remover = explode(";",$row['remover']);
-		$tmp="";
-		$tmp2="";
-		for ($i=0; $i<sizeof($ids); $i++ ){
-			$tmp.="\"".$ids[$i]."\",";
-
-		}
-		$final_controle=rtrim($tmp,",");
-		
-		for ($j=0; $j<sizeof($remover); $j++ ){
-			$tmp2.="\"".$remover[$j]."\",";
-
-		}
-		$final_remover=rtrim($tmp2,",");
 		//print $final_remover."<br>";
 		
 		//$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) order by linkedaccountid, totalcost");		
@@ -201,6 +196,36 @@ function merge_table ($base,$controle) {
 
 }
 
+function send_email ($base,$controle) {
+        $db = new SQLite3('./db/mydb');
+	
+        $results = $db->query("SELECT * FROM $controle");
+	$row="";
+	print "<form action=\"sendemail.php\" method=\"post\">";
+	print "<font size=2>";
+	print "<table border=1>";
+	print "<tr><td>id</td><td>Grupo</td><td>Contrato</td><td>Email</td><td>Enviar Email</td></tr>";
+
+        while ($row = $results->fetchArray()) {
+		$id=$row['id'];
+		$status="<input type=\"checkbox\" name=\"check_list[]\" value=\"$id\">";
+
+		print "<tr><td>".$row['id']."</td>";
+		print "<td>".$row['grupo']."</td>";
+		print "<td>".$row['contrato']."</td>";
+		print "<td>".$row['email']."</td>";
+		print "<td><center>".$status."<center></td></tr>";
+
+
+	}
+	print "</table>";
+	print "<br>";
+	print "</font>";
+	print "<center><input type=\"submit\" name=\"ENVIAR\"/></center>";
+	print "</form>";
+
+}
+
 switch($_GET['id']) {
 	case 'cat1':
 		//$content = 'This is content for page Politics.';
@@ -213,7 +238,7 @@ switch($_GET['id']) {
 		$content = merge_table("baseaws".$prefix."csv","controle".$prefix."csv");
 		break;
 	case 'cat4':
-		//$content = merge_table("baseawscsv","controlecsv");
+		$content = send_email("baseaws".$prefix."csv","controle".$prefix."csv");
 		break;
 	default:
 		$content = 'There was an error.';
