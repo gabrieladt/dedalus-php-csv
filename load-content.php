@@ -221,6 +221,8 @@ function send_email ($base,$controle) {
 	print "</table>";
 	print "<br>";
 	print "</font>";
+	print "<input type=\"hidden\" name=\"base\" value=\"".$base."\">";
+	print "<input type=\"hidden\" name=\"controle\" value=\"".$controle."\">";
 	print "<center><input type=\"submit\" name=\"ENVIAR\"/></center>";
 	print "</form>";
 
