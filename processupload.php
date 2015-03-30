@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-if(!empty($_POST['mes'])) {
-	$prefix=$_POST['mes'] ;
-	if ($prefix == "SELECIONE") {
-		print "<br><br>SELECIONE O MES";
+if(!empty($_POST['chave'])) {
+	$prefix=preg_replace("/[^A-Za-z0-9 ]/", '',$_POST['chave']);
+	if ($prefix == "KEY") {
+		print "<br><br>Entre com uma chave";
 		die;
 	}else{
 		if (empty($_SESSION['id'])){
