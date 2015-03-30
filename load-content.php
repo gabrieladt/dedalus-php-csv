@@ -138,7 +138,8 @@ function merge_table ($base,$controle) {
 			//print $row2['totalcost']."<br>";
 		
 		}
-		$fator = $total * $row["fator"];
+		$fator=str_replace(',', '.', $row["fator"]);
+		$fator = $total * $fator;
 		print "<font size=2>";
                 print "<br>Contrato: ".$row['contrato']."<br>";
 		print "Cliente: ".$row['grupo']." - ".$row['email']."</br>";

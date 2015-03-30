@@ -1,13 +1,7 @@
 <?php
-if(session_id() == '') {
 	session_start();
-	$id=uniqid();
-	if (empty($_SESSION['id'])){
-		$_SESSION['id'] = $id; 
-	}
-}
+	session_destroy();
 ?>
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -132,6 +126,21 @@ function bytesToSize(bytes) {
 <div align="center">
 <h3>Importar AWS CSV</h3>
 <form action="processupload.php" method="post" enctype="multipart/form-data" id="MyUploadForm">
+<select name="mes">
+  <option value="012015">01-2015</option>
+  <option value="022015">02-2015</option>
+  <option value="032015">03-2015</option>
+  <option value="042015">04-2015</option>
+  <option value="052015">05-2015</option>
+  <option value="062015">06-2015</option>
+  <option value="072015">07-2015</option>
+  <option value="082015">08-2015</option>
+  <option value="092015">09-2015</option>
+  <option value="102015">10-2015</option>
+  <option value="112015">11-2015</option>
+  <option value="122015">12-2015</option>
+  <option value="SELECIONE" selected>SELECIONE O MES</option>
+</select>
 <h1>CSV Aws</h1>
 <input name="FileInput" id="FileInput" type="file" />
 <h1>Arquivo de Controle</h1>
@@ -141,6 +150,31 @@ function bytesToSize(bytes) {
 </form>
 <div id="progressbox" ><div id="progressbar"></div ><div id="statustxt">0%</div></div>
 <div id="output"></div>
+</div>
+</div>
+
+
+<div id="upload-wrapper">
+<div align="center">
+<h3>Carregar Já Importado</h3>
+<form action="just_carregar.php" method="post" enctype="multipart/form-data">
+<select name="mes">
+  <option value="012015">01-2015</option>
+  <option value="022015">02-2015</option>
+  <option value="032015">03-2015</option>
+  <option value="042015">04-2015</option>
+  <option value="052015">05-2015</option>
+  <option value="062015">06-2015</option>
+  <option value="072015">07-2015</option>
+  <option value="082015">08-2015</option>
+  <option value="092015">09-2015</option>
+  <option value="102015">10-2015</option>
+  <option value="112015">11-2015</option>
+  <option value="122015">12-2015</option>
+  <option value="SELECIONE" selected>SELECIONE O MES</option>
+</select>
+<input type="submit"  id="submit-btn-carregar" value="Carregar" />
+</form>
 </div>
 </div>
 

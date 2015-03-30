@@ -1,12 +1,18 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['id'])){ //if login in session is not set
-    header("Location: index.php");
-}        
-if (!empty($_SESSION['id'])){
-	$prefix=$_SESSION['id'] ;
+if(!empty($_POST['mes'])) {
+	$prefix=$_POST['mes'] ;
+	if ($prefix == "SELECIONE") {
+		print "<br><br>SELECIONE O MES";
+		die;
+	}else{
+		if (empty($_SESSION['id'])){
+			$_SESSION['id'] = $prefix;
+		}
+	}
 }
+
 $db = new SQLite3('./db/mydb');
 $db1 = new SQLite3('./db/mydb');
 
@@ -177,7 +183,8 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	}
 	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle".$prefix."csv" ))
 	   {
-		echo("Success! File Uploaded: $File_Name_controle");
+		echo("Success! File Uploaded: $File_Name_controle <br>");
+		echo("MES: $prefix");
 		import_csv ($UploadDirectory."controle".$prefix."csv");
 		$error_cont=1;
 	}else{
