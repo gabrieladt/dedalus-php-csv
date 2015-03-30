@@ -29,6 +29,8 @@ $db1 = new SQLite3('./db/mydb');
 //	print_r ($row)."<b><br>";
 //}
 //print "--------------<br>";
+
+/* NAO PRECISA REMOVER MAIS
 $old= date("Y-m-d", time() - (86400*30));
 
 $results = $db->query("SELECT * FROM controle_tabelas where created <= '$old'");
@@ -47,7 +49,7 @@ foreach ($tabela as $value) {
 	unlink("./uploads/$value");
 }
 //$db->exec("DROP TABLE IF EXISTS $tabela");
-
+*/
 //$table="baseaws.csv";
 //$date = new DateTime('2015-02-01');
 //$dia = $date->format('Y-m-d');
