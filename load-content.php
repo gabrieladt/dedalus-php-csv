@@ -70,7 +70,7 @@ function read_table_controle ($table) {
 //	}
 	print "<font size=2>";
 	print "<table border=1.5>";
-	print "<tr><td>id</td><td>contrato</td><td>Grupo</td><td>Linkedaccountid</td><td>Remover</td><td>fator</td><td>Email</td></tr>";
+	print "<tr><td>id</td><td>contrato</td><td>Grupo</td><td>Linkedaccountid</td><td>Remover</td><td>RegExp<td>fator</td><td>Email</td></tr>";
 
 	$results = $db->query("SELECT * FROM $table");
 	while ($row = $results->fetchArray()) {
@@ -79,6 +79,7 @@ function read_table_controle ($table) {
 		print "<td>".$row['grupo']."</td>";
 		print "<td>".$row['linkedaccountid']."</td>";
 		print "<td>".$row['remover']."</td>";
+		print "<td>".$row['removeregexp']."</td>";
 		print "<td>".$row['fator']."</td>";
 		print "<td>".$row['email']."</td></tr>";
 
@@ -92,6 +93,7 @@ function read_table_controle ($table) {
 
 function merge_table ($base,$controle) {
         $db = new SQLite3('./db/mydb');
+	$db->loadExtension("pcre.so");
 	print "Index:<br><br>";
 	print "<a name=\"Index\">";
 	
@@ -112,6 +114,7 @@ function merge_table ($base,$controle) {
 
                 $ids = explode(";",$row['linkedaccountid']);
                 $remover = explode(";",$row['remover']);
+                $remover_regexp = $row['removeregexp'];
                 $tmp="";
                 $tmp2="";
                 for ($i=0; $i<sizeof($ids); $i++ ){
@@ -127,6 +130,7 @@ function merge_table ($base,$controle) {
                 $final_remover=rtrim($tmp2,",");
 
 		$update_base1 = $db->query("update $base set removed=1 where linkedaccountid in ($final_controle) and productcode in ($final_remover)");		
+		$update_base2 = $db->query("update $base set removed=1 where linkedaccountid in ($final_controle) and itemdescription REGEXP '$remover_regexp'");		
 		$results_base2 = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) and removed=0");
 		$j=0;
 		$total=0;
@@ -145,8 +149,8 @@ function merge_table ($base,$controle) {
 		print "Cliente: ".$row['grupo']." - ".$row['email']."</br>";
 		print "Fator: ".$row['fator']."</br>";
 		//print "Total Fatura: R$ ".$total." <br>";
-		print "Total Fatura: R$ ".number_format($total, 2, ',', '')." <br>";
-		print "Total Fatura * Fator: R$ ".number_format($fator, 2, ',', '')." <br>";
+		print "Total Fatura: $ ".number_format($total, 2, ',', '')." <br>";
+		print "Total Fatura * Fator: $ ".number_format($fator, 2, ',', '')." <br>";
 		print "</font>";
 		
 		print "<font size=1.5>";
@@ -155,7 +159,7 @@ function merge_table ($base,$controle) {
 		//print $final_remover."<br>";
 		
 		//$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) order by linkedaccountid, totalcost");		
-		$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle)");		
+		$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) order by removed DESC");		
 		//$results_base = $db->query("SELECT * FROM $base where linkedaccountid in ($final_controle) and removed=0");		
 		$row="";
 		while ($row = $results_base->fetchArray()) {
@@ -163,7 +167,7 @@ function merge_table ($base,$controle) {
 			$remover = $row['removed'];	
 			if ( $remover == '1' ) {  
 				$bg="#FF6347";
-				$status="Remov.Controle";
+				$status="R.Controle";
 			}elseif ( $remover == '2' ) {
 				$bg="#F0E68C";
                                 $status="Rm.Manual(<a href=\"./restore.php?id=$id\">Restore</a>)";

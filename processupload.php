@@ -14,13 +14,12 @@ if(!empty($_POST['chave'])) {
 }
 
 $db = new SQLite3('./db/mydb');
-$db1 = new SQLite3('./db/mydb');
+//$db1 = new SQLite3('./db/mydb');
 
 //$create_table_sql = "DROP table controle_tabelas";
 //$create_table_sql = "CREATE TABLE IF NOT EXISTS controle_tabelas (id TEXT primary key,tabela TEXT, date TEXT)";
-//$create_table_sql = "CREATE TABLE IF NOT EXISTS controle_tabelas (tabela TEXT primary key, created date)";
+//$create_table_sql = "CREATE TABLE IF NOT EXISTS controle_tabelas (tabela TEXT primary key, chave TEXT, created date)";
 //$db->exec($create_table_sql);
-
 
 
 //$results = $db->query("SELECT name FROM sqlite_master WHERE type='table';");
@@ -62,7 +61,7 @@ foreach ($tabela as $value) {
 //session_destroy();
 
 
-function import_csv ($csv_path) {
+function import_csv ($csv_path,$prefix) {
 
 //Open the database mydb
 $db = new SQLite3('./db/mydb');
@@ -97,7 +96,8 @@ if (($csv_handle = fopen($csv_path, "r")) === FALSE)
 	$date = new DateTime();
 	$dia = $date->format('Y-m-d');
 
-	$db->exec("INSERT OR IGNORE INTO controle_tabelas (tabela,created) values (\"".$table."\",\"".$dia."\")");
+	//echo "INSERT OR IGNORE INTO controle_tabelas (tabela,chave,created) values (\"".$table."\",\"".$prefix."\",\"".$dia."\")";
+	$db->exec("INSERT OR IGNORE INTO controle_tabelas (tabela,chave,created) values (\"".$table."\",\"".$prefix."\",\"".$dia."\")");
 
 	$insert_fields_str = join(', ', $fields);
 	$insert_values_str = join(', ', array_fill(0, count($fields),  '?'));
@@ -178,7 +178,7 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	if(move_uploaded_file($_FILES['FileInput']['tmp_name'],$UploadDirectory."baseaws".$prefix."csv" ))
 	   {
 		echo ("Success! File Uploaded: $File_Name <br>");
-		import_csv ($UploadDirectory."baseaws".$prefix."csv");
+		import_csv ($UploadDirectory."baseaws".$prefix."csv",$prefix);
 		$error_base=1;
 	}else{
 		die("error uploading Files!");
@@ -186,8 +186,8 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	if(move_uploaded_file($_FILES['FileInput_controle']['tmp_name'], $UploadDirectory."controle".$prefix."csv" ))
 	   {
 		echo("Success! File Uploaded: $File_Name_controle <br>");
-		echo("MES: $prefix");
-		import_csv ($UploadDirectory."controle".$prefix."csv");
+		echo("KEY: $prefix");
+		import_csv ($UploadDirectory."controle".$prefix."csv",$prefix);
 		$error_cont=1;
 	}else{
 		die("error uploading Files!");

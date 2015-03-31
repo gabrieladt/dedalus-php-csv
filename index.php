@@ -145,8 +145,16 @@ Inserir sua chave (Alpha Numerica)<br>
 <div align="center">
 <h3>Carregar Já Importado</h3>
 <form action="just_carregar.php" method="post" enctype="multipart/form-data">
-Inserir sua chave (Alpha Numerica)<br>
-<input type="text" name="chave" value="KEY"><br>
+<select name="chave">
+  <option value="KEY" selected>Selecionar Chave Existente</option>
+<?php
+        $db = new SQLite3('./db/mydb');
+        $results = $db->query("SELECT chave FROM controle_tabelas group by chave");
+        while ($row = $results->fetchArray()) {
+		print "<option value=\"".$row['chave']."\">".$row['chave']."</option>";
+        }
+?>
+</select>
 <input type="submit"  id="submit-btn-carregar" value="Carregar" />
 </form>
 </div>
